@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register - My Shop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">HOME</a>
+        <a href="products.html">PRODUCTS</a>
+        <a href="cart.html">CART</a>
+        <a href="contact.html">CONTACT</a>
+        <a href="about.html">ABOUT</a>
+        <a href="login.html">LOGIN</a>
+    </nav>
+
+    <header>
+        <h1>Account</h1>
+    </header>
+
+    <main class="auth-page" style="max-width:720px;margin:30px auto;padding:20px;">
+        <div class="auth-container">
+            <div class="auth-forms" style="display:grid;gap:20px;">
+                <section class="register">
+                    <h2>Register</h2>
+                    <form id="registerForm">
+                        <label>Name</label>
+                        <input type="text" id="regName" required>
+
+                        <label>Email</label>
+                        <input type="email" id="regEmail" required>
+
+                        <label>Phone</label>
+                        <input type="tel" id="regPhone" placeholder="+254700000000" required>
+
+                        <label>Password</label>
+                        <input type="password" id="regPassword" minlength="4" required>
+
+                        <button class="btn btn-primary" type="submit">Save Details (Register)</button>
+                    </form>
+                </section>
+
+                <section class="login">
+                    <h2>Login</h2>
+                    <form id="loginForm">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" required>
+
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required>
+
+                        <button class="btn btn-primary" type="submit">Login</button>
+                    </form>
+                </section>
+
+                <section id="accountArea" style="display:none;">
+                    <h2>Logged In</h2>
+                    <div id="accountInfo"></div>
+                    <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="JS Script.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

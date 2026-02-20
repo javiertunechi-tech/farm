@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="JS Script.js">
+</head>
+<body>
+      <!-- Navigation -->
+    <nav>
+     <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="contact.html">Contact</a>
+        <a href="about.html">About</a>
+        <a href="cart.html">Cart</a>
+    </nav>
+     <header>
+        <h1>Get In Touch</h1>
+        <p class="lead">We'd love to hear from you! Send us a message and we'll respond as soon as possible.</p>
+    </header>
+      <main>
+        <div class="contact-layout">
+            <!-- Contact Form -->
+            <section class="contact-form">
+                <h2>Send Us A Message</h2>
+                <form id="contactForm" novalidate>
+                    <div>
+                        <label for="name">Full Name *</label>
+                        <input id="name" name="name" type="text" required placeholder="Your full name">
+                    </div>
+
+                    <div>
+                        <label for="email">Email Address *</label>
+                        <input id="email" name="email" type="email" required placeholder="your@email.com">
+                    </div>
+
+                    <div>
+                        <label for="phone">Phone Number</label>
+                        <input id="phone" name="phone" type="tel" placeholder="+254 700 000000">
+                    </div>
+
+                    <div>
+                        <label for="subject">Subject *</label>
+                        <input id="subject" name="subject" type="text" required placeholder="How can we help?">
+                    </div>
+
+                    <div>
+                        <label for="message">Message *</label>
+                        <textarea id="message" name="message" required placeholder="Tell us more about your inquiry..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="button">Send Message</button>
+                        <button type="reset" class="button secondary">Clear Form</button>
+                    </div>
+                    <div id="formFeedback" role="status" aria-live="polite"></div>
+                </form>
+            </section>
+
+            <!-- Contact Information Sidebar -->
+            <aside class="contact-info">
+                <!-- Email Card -->
+                <div class="info-card">
+                    <div class="info-card-icon">📧</div>
+                    <h3>Email</h3>
+                    <p><a href="mailto:javier@tunechi.drip.co.ke">javier@tunechi.drip.co.ke</a></p>
+                    <p style="font-size: 0.9rem;">We respond within 24-48 hours</p>
+                </div>
+
+                <!-- Phone Card -->
+                <div class="info-card">
+                    <div class="info-card-icon">📱</div>
+                    <h3>Phone</h3>
+                    <p><a href="tel:+254717712985">+254 717712985</a></p>
+                    <p style="font-size: 0.9rem;">Mon-Fri: 9:00 AM - 6:00 PM</p>
+                </div>
+
+                <!-- Address Card -->
+                <div class="info-card">
+                    <div class="info-card-icon">📍</div>
+                    <h3>Address</h3>
+                    <p>My Shop<br>Nairobi, Kenya</p>
+                    <p style="font-size: 0.9rem;">Available for local pickups</p>
+                </div>
+
+                <!-- Hours Card -->
+                <div class="info-card">
+                    <div class="info-card-icon">⏰</div>
+                    <h3>Business Hours</h3>
+                    <ul class="hours-list">
+                        <li>
+                            <strong>Mon - Fri:</strong>
+                            <span>8:00 AM - 6:00 PM</span>
+                        </li>
+                        <li>
+                            <strong>Saturday:</strong>
+                            <span>10:00 AM - 4:00 PM</span>
+                        </li>
+                        <li>
+                            <strong>Sunday:</strong>
+                            <span>Closed</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Social Links Card -->
+                <div class="info-card">
+                    <div class="info-card-icon">🤝</div>
+                    <h3>Follow Us</h3>
+                    <p>Stay updated with our latest products and offers</p>
+                    <div class="social-links">
+                        <a href="#" title="Instagram">📷</a>
+                        <a href="#" title="Facebook">f</a>
+                        <a href="#" title="Twitter">𝕏</a>
+                        <a href="#" title="WhatsApp">💬</a>
+                    </div>
+                </div>
+
+                <!-- FAQ Section -->
+                <div class="faq-section">
+                    <h4>❓ Quick FAQ</h4>
+                    <p><strong>Response time?</strong> We typically respond within 24-48 hours on business days.</p>
+                    <p style="margin-top: 12px;"><strong>Payment methods?</strong> We accept M-Pesa, bank transfer, and card payments.</p>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="year"></span> My Shop. All rights reserved.</p>
+        <p>📧 javier@tunechi.drip.co.ke • 📱 +254 717712985 • 💬 24/7 Customer Support</p>
+    </footer>
+
+    <button id="themetoggle">🌙 Dark Mode</button>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themetoggle');
+        const htmlElement = document.documentElement;
+        
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-theme', currentTheme);
+        updateThemeButton(currentTheme);
+        
+        function updateThemeButton(theme) {
+            if (theme === 'light') {
+                themeToggle.textContent = '🌙 Dark Mode';
+            } else {
+                themeToggle.textContent = '☀️ Light Mode';
+            }
+        }
+        
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+        });
+
+        // Set current year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Contact Form Handling
+        const form = document.getElementById('contactForm');
+        const feedback = document.getElementById('formFeedback');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!form.checkValidity()) {
+                feedback.textContent = '❌ Please fill all required fields correctly.';
+                feedback.classList.add('error');
+                feedback.classList.remove('success');
+                return;
+            }
+
+            const data = {
+                name: form.name.value.trim(),
+                email: form.email.value.trim(),
+                phone: form.phone.value.trim(),
+                subject: form.subject.value.trim(),
+                message: form.message.value.trim()
+            };
+
+            // Log the data (in a real app, send to backend)
+            console.log('Contact form submission:', data);
+
+            // Show success message
+            feedback.textContent = '✅ Thank you! Your message has been sent. We\'ll respond within 24-48 hours.';
+            feedback.classList.add('success');
+            feedback.classList.remove('error');
+            
+            // Reset form
+            form.reset();
+            
+            // Hide feedback after 5 seconds
+            setTimeout(() => {
+                feedback.classList.remove('success', 'error');
+            }, 5000);
+        });
+    </script>
+    
+
+</body>
+</html>

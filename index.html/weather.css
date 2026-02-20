@@ -1,0 +1,15 @@
+/* Minimal styles for weather page */
+.weather-page{max-width:1000px;margin:28px auto;padding:20px}
+.weather-controls{display:grid;grid-template-columns:1fr 220px;gap:16px;align-items:end}
+.field label{display:block;margin-bottom:6px;color:#d0d0d0}
+.field input,.field select{padding:10px;border-radius:6px;border:1px solid #2d2d2d;background:#0a0a0a;color:#fff;width:100%}
+.actions{display:flex;gap:10px}
+.api-note{margin-top:10px;color:#bdbdbd;font-size:0.9rem}
+.weather-results{margin-top:22px}
+.location{font-weight:700;color:#ff6b6b;margin-bottom:6px}
+.suggestion{padding:14px;border-radius:8px;background:linear-gradient(90deg,#f7f7f7,#fff);color:#111;margin-bottom:12px}
+.forecast-list{display:flex;gap:12px;flex-wrap:wrap}
+.forecast-card{background:#111;padding:12px;border-radius:8px;border:1px solid #222;width:140px}
+.forecast-card h4{margin-bottom:6px;color:#fff}
+.forecast-card .temp{font-weight:700;color:#ff6b6b}
+.forecast-card .desc{color:#bdbdbd;font-size:0.9rem}

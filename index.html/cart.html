@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - My Shop</title>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+      <nav>
+        <a href="index.html">HOME</a>
+        <a href="products.html">PRODUCTS</a>
+        <a href="cart.html">CART</a>
+        <a href="contact.html">CONTACT</a>
+        <a href="about.html">ABOUT</a>
+    </nav>
+    
+      <header>
+        <h1>🛒 Shopping Cart</h1>
+        <div class="header-controls">
+            <button id="themetoggle">🌙 Dark Mode</button>
+        </div>
+    </header>
+<div>
+    <div class="cart-container">
+        <div id="emptyCart" class="cart-empty" style="display: none;">
+            <h2>Your cart is empty</h2>
+            <p>Looks like you haven't added anything to your cart yet.</p>
+            <a href="products.html" class="continue-shopping">Continue Shopping</a>
+        </div>
+         <div id="cartContent" style="display: none;">
+            <div class="cart-items">
+                <div class="cart-header">
+                    <div>Product</div>
+                    <div>Price</div>
+                    <div>Quantity</div>
+                    <div style="text-align: right;">Action</div>
+                </div>
+                <div id="cartItemsList"></div>
+            </div>
+
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>KSh <span id="subtotal">0</span></span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping:</span>
+                    <span>KSh <span id="shipping">0</span></span>
+                </div>
+                <div class="summary-row">
+                    <span>Total:</span>
+                    <span>KSh <span id="total">0</span></span>
+                </div>
+                <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+                <button class="clear-cart-btn" onclick="clearCart()">Clear Cart</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- M-Pesa Checkout Modal -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content">
+            <h2>💳 M-Pesa Payment</h2>
+            <p>Complete your purchase using M-Pesa</p>
+            
+            <div class="info-box">
+                <strong>Total Amount:</strong> KSh <span id="modalTotal">0</span>
+            </div>
+
+            <form class="modal-form" id="paymentForm">
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number *</label>
+                    <input 
+                        type="tel" 
+                        id="phoneNumber" 
+                        placeholder="+254 700 000000" 
+                        required
+                    >
+                    <div class="form-error" id="phoneError">Please enter a valid Kenyan phone number</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mpesaPin">M-Pesa PIN *</label>
+                    <input 
+                        type="password" 
+                        id="mpesaPin" 
+                        placeholder="****" 
+                        required
+                        maxlength="4"
+                    >
+                    <div class="form-error" id="pinError">PIN must be 4 digits</div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-btn cancel" onclick="closeCheckoutModal()">Cancel</button>
+                    <button type="submit" class="modal-btn confirm">Confirm Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+    
+    <script src="JS Script.js"></script>
+</body>
+</html>

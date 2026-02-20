@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Weather & Planting Advice - My Shop</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="weather.css">
+</head>
+<body>
+  <nav>
+    <a href="index.html">HOME</a>
+    <a href="products.html">PRODUCTS</a>
+    <a href="cart.html">CART</a>
+    <a href="login.html">LOGIN</a>
+    <a href="contact.html">CONTACT</a>
+    <a href="about.html">ABOUT</a>
+  </nav>
+
+  <header>
+    <h1>Local Weather & Crop Advice</h1>
+  </header>
+
+  <main class="weather-page">
+    <section class="weather-controls">
+      <div class="field">
+        <label for="city">City (or postcode)</label>
+        <input id="city" placeholder="e.g. Nairobi" />
+      </div>
+
+      <div class="field">
+        <label for="crop">Select crop</label>
+        <select id="crop">
+          <option value="Potattoes">Potattoes</option>
+          <option value="Maize">Maize</option>
+          <option value="Rice">Rice</option>
+          <option value="Sorghum">Sorghum</option>
+          <option value="Millet">Millet</option>
+          <option value="Beans">Beans</option>
+          <option value="Tea leaves">Tea leaves</option>
+          <option value="Coffee">Coffee</option>
+          <option value="Kales">Kales</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button id="useLocation" class="btn btn-secondary">Use My Location</button>
+        <button id="checkBtn" class="btn btn-primary">Check Forecast & Advice</button>
+      </div>
+
+      <div id="apiKeyNotice" class="api-note">Note: This page uses OpenWeather API. You can either run the local proxy server (<code>npm start</code>) or enter an OpenWeather API key below to query the API directly (the key will be stored locally).</div>
+
+      <div id="apiKeyPanel" class="api-key-panel" style="margin-top:10px;display:none;">
+        <label for="apiKeyInput">OpenWeather API key (optional)</label>
+        <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
+          <input id="apiKeyInput" placeholder="paste your OpenWeather API key" style="flex:1;padding:6px" />
+          <button id="saveApiKeyBtn" class="btn">Save key</button>
+          <button id="clearApiKeyBtn" class="btn btn-secondary">Clear</button>
+        </div>
+        <div style="font-size:0.85rem;color:#666;margin-top:6px">Storing the key in your browser is convenient but exposes it to anyone with access to your machine/browser profile. Running the proxy keeps the key secret.</div>
+      </div>
+    </section>
+
+    <section id="results" class="weather-results" style="display:none;">
+      <div id="locationLabel" class="location"></div>
+      <div id="suggestion" class="suggestion"></div>
+      <h3>7-day forecast</h3>
+      <div id="forecastList" class="forecast-list"></div>
+    </section>
+  </main>
+
+  <script>
+    // Small helper: reverse-geocode, map county to climate, and show crop advice.
+    (function(){
+      const suggestion = () => document.getElementById('suggestion');
+
+      const climateMap = {
+        "Arid/Hot": ["Turkana","Marsabit","Mandera","Wajir","Garissa","Isiolo","Samburu","Tana River"],
+        "Coastal/Tropical": ["Mombasa","Kwale","Kilifi","Lamu","Taita-Taveta","Tana River"],
+        "Highland/Temperate": ["Nairobi","Kiambu","Nyeri","Kirinyaga","Murang'a","Nyandarua","Embu","Meru","Tharaka-Nithi","Laikipia","Nakuru","Kericho","Bomet","Nandi","Uasin Gishu","Elgeyo-Marakwet","Trans Nzoia"],
+        "Lake/Rainy": ["Kisumu","Homa Bay","Migori","Kisii","Nyamira","Siaya","Busia"],
+        "Agricultural/Mixed": ["Kajiado","Baringo","West Pokot","Nakuru","Narok","Kakamega","Vihiga","Bungoma"]
+      };
+
+      function mapCountyToClimate(county){
+        if(!county) return 'Unknown';
+        county = county.replace(/County$/i,'').trim();
+        for(const [g,list] of Object.entries(climateMap)){
+          if(list.find(c => c.toLowerCase() === county.toLowerCase())) return g;
+        }
+        return 'Mixed/Unknown';
+      }
+
+      async function reverseGeocode(lat, lon){
+        try{
+          const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`;
+          const res = await fetch(url, {headers:{'Accept':'application/json','User-Agent':'wat-weather-app'}}).catch(()=>null);
+          if(!res || !res.ok) return null;
+          const d = await res.json().catch(()=>null);
+          if(!d) return null;
+          return (d.address && (d.address.county || d.address.state_district || d.address.region)) || null;
+        }catch(e){ return null; }
+      }
+
+      async function ipFallback(){
+        try{
+          const r = await fetch('https://ipapi.co/json/').catch(()=>null);
+          if(!r || !r.ok) return null;
+          const d = await r.json().catch(()=>null);
+          if(!d) return null;
+          if(d.latitude && d.longitude) return {lat:d.latitude, lon:d.longitude, city:d.city};
+        }catch(e){}
+        return null;
+      }
+
+      const recommendMap = {
+        'Arid/Hot': 'Sorghum',
+        'Coastal/Tropical': 'Rice',
+        'Highland/Temperate': 'Potattoes',
+        'Lake/Rainy': 'Rice',
+        'Agricultural/Mixed': 'Maize',
+        'Mixed/Unknown': 'Maize',
+        'Unknown': 'Maize'
+      };
+
+      const tipsMap = {
+        'Arid/Hot': 'Sorghum or Millet recommended. Mulch, conserve moisture, sow close to rains.',
+        'Coastal/Tropical': 'Rice (irrigated/low areas), Maize or Kales. Ensure drainage and pest control.',
+        'Highland/Temperate': 'Potatoes, Tea or Coffee at elevation, Kales. Avoid waterlogging; use well-drained soils.',
+        'Lake/Rainy': 'Rice (flood tolerant), Maize, Beans. Rotate crops and manage fungal risks.',
+        'Agricultural/Mixed': 'Maize, Beans, Potatoes. Use crop rotation and soil fertility practices.',
+        'Mixed/Unknown': 'Maize or Beans are flexible choices; check local rainfall before planting.',
+        'Unknown': 'Maize or Beans are safe general choices; consider local advice.'
+      };
+
+      function showGuide(climate, county, lat, lon){
+        const locationLabel = document.getElementById('locationLabel');
+        locationLabel.textContent = `County: ${county || 'Unknown'} — Climate: ${climate}`;
+        const s = suggestion(); if(s) s.textContent = lat && lon ? `Location: ${lat.toFixed(4)}, ${lon.toFixed(4)}` : '';
+
+        const cropEl = document.getElementById('crop');
+        const rec = recommendMap[climate] || 'Maize';
+        if(cropEl){
+          const opt = Array.from(cropEl.options).find(o=>o.value.toLowerCase()===rec.toLowerCase());
+          if(opt) cropEl.value = opt.value;
+        }
+
+        let guide = document.getElementById('plantingGuide');
+        if(!guide){
+          guide = document.createElement('div');
+          guide.id = 'plantingGuide';
+                  guide.style.marginTop = '10px';
+                  guide.style.padding = '12px';
+                  guide.style.background = '#fffef8';
+                  guide.style.borderRadius = '8px';
+                  guide.style.color = '#111';
+                  guide.style.border = '2px solid #3498db';
+                  guide.style.fontWeight = '600';
+                  guide.style.fontSize = '1.02rem';
+          suggestion().parentNode.insertBefore(guide, suggestion().nextSibling);
+        }
+        guide.innerHTML = `<strong>Recommended crop:</strong> ${rec}<br>${tipsMap[climate] || ''}`;
+      }
+
+      async function handleGeolocation(){
+        const locLabel = document.getElementById('locationLabel');
+        locLabel.textContent = 'Locating...';
+        if(navigator.geolocation){
+          navigator.geolocation.getCurrentPosition(async pos=>{
+            const lat = pos.coords.latitude, lon = pos.coords.longitude;
+            const county = await reverseGeocode(lat, lon);
+            const climate = mapCountyToClimate(county);
+            showGuide(climate, county, lat, lon);
+            document.getElementById('results').style.display = 'block';
+          }, async ()=>{
+            const ip = await ipFallback();
+            if(ip){
+              const county = await reverseGeocode(ip.lat, ip.lon);
+              const climate = mapCountyToClimate(county);
+              showGuide(climate, county, ip.lat, ip.lon);
+              document.getElementById('results').style.display = 'block';
+            } else {
+              locLabel.textContent = 'Location unavailable';
+            }
+          }, {timeout:8000});
+        } else {
+          const ip = await ipFallback();
+          if(ip){
+            const county = await reverseGeocode(ip.lat, ip.lon);
+            const climate = mapCountyToClimate(county);
+            showGuide(climate, county, ip.lat, ip.lon);
+            document.getElementById('results').style.display = 'block';
+          } else locLabel.textContent = 'Geolocation not supported';
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', ()=>{
+        const useBtn = document.getElementById('useLocation');
+        if(useBtn) useBtn.addEventListener('click', handleGeolocation);
+
+        // Also attach to the Check Forecast button to show climate when user enters a city
+        window.addEventListener('load', ()=>{
+          const checkBtn = document.getElementById('checkBtn');
+          const cityEl = document.getElementById('city');
+          if(checkBtn && cityEl){
+            checkBtn.addEventListener('click', async ()=>{
+              const city = cityEl.value.trim();
+              if(!city) return;
+              // geocodeCity is defined in weather.js; call it if available
+              if(typeof window.geocodeCity === 'function'){
+                try{
+                  const loc = await window.geocodeCity(city);
+                  if(loc){
+                    const county = await reverseGeocode(loc.lat, loc.lon);
+                    const climate = mapCountyToClimate(county);
+                    showGuide(climate, county, loc.lat, loc.lon);
+                    document.getElementById('results').style.display = 'block';
+                  }
+                }catch(e){ /* ignore */ }
+              }
+            });
+          }
+        });
+      });
+    })();
+  </script>
+  <script src="weather.js"></script>
+</body>
+</html>
